@@ -458,6 +458,7 @@ class ProbePointsHelper:
         self.lift_speed = self.speed
         self.probe_offsets = (0., 0., 0.)
         self.manual_results = []
+        self.probe_name = 'probe'
     def minimum_points(self,n):
         if len(self.probe_points) < n:
             raise self.printer.config_error(
@@ -494,7 +495,7 @@ class ProbePointsHelper:
     def start_probe(self, gcmd):
         manual_probe.verify_no_manual_probe(self.printer)
         # Lookup objects
-        probe = self.printer.lookup_object('probe', None)
+        probe = self.printer.lookup_object(self.probe_name, None)
         method = gcmd.get('METHOD', 'automatic').lower()
         def_move_z = self.default_horizontal_move_z
         self.horizontal_move_z = gcmd.get_float('HORIZONTAL_MOVE_Z',
@@ -504,6 +505,7 @@ class ProbePointsHelper:
             self.lift_speed = self.speed
             self.probe_offsets = (0., 0., 0.)
             self.manual_results = []
+        self.probe_name = 'probe'
             self._manual_probe_start()
             return
         # Perform automatic probing
@@ -535,6 +537,7 @@ class ProbePointsHelper:
                 return
             # Caller wants a "retry" - clear results and restart probing
             self.manual_results = []
+        self.probe_name = 'probe'
         self._move_next(len(self.manual_results))
         gcmd = self.gcode.create_gcode_command("", "", {})
         manual_probe.ManualProbeHelper(self.printer, gcmd,

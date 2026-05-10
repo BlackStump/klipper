@@ -821,6 +821,7 @@ class ProbeManager:
         self.substitutes = collections.OrderedDict()
         self.is_round = orig_config["radius"] is not None
         self.probe_helper = probe.ProbePointsHelper(config, finalize_cb, [])
+        self.probe_helper.probe_name = config.get('probe', 'probe')
         self.probe_helper.use_xy_offsets(True)
         self.rapid_scan_helper = RapidScanHelper(config, self, finalize_cb)
         self._init_faulty_regions(config)
@@ -866,7 +867,7 @@ class ProbeManager:
     def start_probe(self, gcmd):
         method = gcmd.get("METHOD", "automatic").lower()
         can_scan = False
-        pprobe = self.printer.lookup_object("probe", None)
+        pprobe = self.printer.lookup_object(self.probe_helper.probe_name, None)
         if pprobe is not None:
             probe_name = pprobe.get_status(None).get("name", "")
             can_scan = probe_name.startswith("probe_eddy_current")
