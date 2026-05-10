@@ -505,7 +505,6 @@ class ProbePointsHelper:
             self.lift_speed = self.speed
             self.probe_offsets = (0., 0., 0.)
             self.manual_results = []
-        self.probe_name = 'probe'
             self._manual_probe_start()
             return
         # Perform automatic probing
