@@ -825,6 +825,7 @@ class ProbeManager:
         self.probe_helper.probe_name = _probe_name
         self.probe_helper.use_xy_offsets(True)
         self.rapid_scan_helper = RapidScanHelper(config, self, finalize_cb)
+        self.rapid_scan_helper.probe_name = self.probe_helper.probe_name
         self._init_faulty_regions(config)
 
     def _init_faulty_regions(self, config):
@@ -1184,6 +1185,7 @@ class RapidScanHelper:
         self.speed = config.getfloat("speed", 50., above=0.)
         self.scan_height = config.getfloat("horizontal_move_z", 5.)
         self.finalize_callback = finalize_cb
+        self.probe_name = 'probe'
 
     def perform_rapid_scan(self, gcmd):
         speed = gcmd.get_float("SCAN_SPEED", self.speed)
@@ -1191,7 +1193,7 @@ class RapidScanHelper:
         gcmd.respond_info(
             "Beginning rapid surface scan at height %.2f..." % (scan_height)
         )
-        pprobe = self.printer.lookup_object("probe")
+        pprobe = self.printer.lookup_object(self.probe_name)
         toolhead = self.printer.lookup_object("toolhead")
         # Calculate time window around which a sample is valid.  Current
         # assumption is anything within 2mm is usable, so:
@@ -1229,7 +1231,7 @@ class RapidScanHelper:
     def _raise_tool(self, gcmd, scan_height):
         # If the nozzle is below scan height raise the tool
         toolhead = self.printer.lookup_object("toolhead")
-        pprobe = self.printer.lookup_object("probe")
+        pprobe = self.printer.lookup_object(self.probe_name)
         cur_pos = toolhead.get_position()
         if cur_pos[2] >= scan_height:
             return
@@ -1241,7 +1243,7 @@ class RapidScanHelper:
     def _move_to_scan_height(self, gcmd, scan_height):
         time_window = gcmd.get_float("SAMPLE_TIME")
         toolhead = self.printer.lookup_object("toolhead")
-        pprobe = self.printer.lookup_object("probe")
+        pprobe = self.printer.lookup_object(self.probe_name)
         cur_pos = toolhead.get_position()
         pparams = pprobe.get_probe_params(gcmd)
         lift_speed = pparams["lift_speed"]
